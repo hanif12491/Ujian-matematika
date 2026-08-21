@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Kelola Ujian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden-view { display: none !important; }
+        table.custom-table { border-collapse: collapse; width: 100%; margin-top: 10px; margin-bottom: 10px; }
+        table.custom-table th, table.custom-table td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; }
+        table.custom-table th { background-color: #f1f5f9; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <nav class="bg-green-600 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold">Panel Admin / Guru - Modul Ujian</h1>
+        <a href="../login.php" class="bg-red-500 px-4 py-2 rounded text-sm font-bold hover:bg-red-600">Logout</a>
+    </nav>
+
+    <div class="container mx-auto p-6 max-w-7xl">
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 pb-2 border-b">Buat Ujian Baru</h3>
+            <form onsubmit="handleAddExam(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1 text-sm">Judul Ujian</label>
+                    <input type="text" id="new-exam-title" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Contoh: PAS Matematika..." required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1 text-sm">Jenjang</label>
+                    <select id="new-exam-jenjang" onchange="populateClassOptions('new-exam-jenjang', 'new-exam-kelas')" class="w-full px-3 py-2 border rounded-lg text-sm bg-white" required>
+                        <option value="" disabled selected>Pilih Jenjang...</option>
+                        <option value="SD / MI">SD / MI</option>
+                        <option value="SMP / MTs">SMP / MTs</option>
+                        <option value="SMA / SMK">SMA / SMK</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1 text-sm">Kelas</label>
+                    <select id="new-exam-kelas" class="w-full px-3 py-2 border rounded-lg text-sm bg-white" required>
+                        <option value="" disabled selected>Pilih Jenjang Dulu...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1 text-sm">Durasi</label>
+                    <select id="new-exam-durasi" class="w-full px-3 py-2 border rounded-lg text-sm bg-white">
+                        <option value="60 Menit">60 Menit</option>
+                        <option value="90 Menit" selected>90 Menit</option>
+                        <option value="120 Menit">120 Menit</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <button type="submit" class="w-full bg-green-600 text-white font-bold py-2 rounded-lg hover:bg-green-700 transition text-sm">BUAT UJIAN</button>
+                </div>
+            </form>
+        </div>
+
+        <h3 class="text-xl font-bold mb-4">Daftar Ujian & Kontrol Sesi</h3>
+        <div id="guru-exam-list" class="space-y-4"></div>
+    </div>
+
+    <!-- MODAL HASIL & BUKA KUNCI SISWA -->
+    <div id="modal-exam-results" class="hidden-view fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-4xl w-full max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 id="result-modal-title" class="text-xl font-bold text-gray-800">Rekap Hasil & Buka Kunci Siswa</h3>
+                <button onclick="closeResultModal()" class="text-gray-500 font-bold text-xl">✕</button>
+            </div>
+            <p class="text-xs text-gray-500 mb-4">Gunakan tombol <strong>🔓 Buka Kunci</strong> untuk siswa yang tidak sengaja menekan tombol selesai ujian agar bisa mengerjakan ulang.</p>
+            <div id="result-modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulasi database ujian dari localStorage
+        let examsDB = JSON.parse(localStorage.getItem('cbt_exams_db')) || [];
+        let examResultsDB = JSON.parse(localStorage.getItem('cbt_results_db')) || [];
+
+        function populateClassOptions(jenjangId, kelasId) {
+            const jenjang = document.getElementById(jenjangId).value;
+            const kelasSelect = document.getElementById(kelasId);
+            kelasSelect.innerHTML = '<option value="" disabled selected>Pilih Kelas...</option>';
+            let classes = jenjang === "SD / MI" ? ["1","2","3","4","5","6"] : (jenjang === "SMP / MTs" ? ["7","8","9"] : ["10","11","12"]);
+            classes.forEach(c => {
+                kelasSelect.innerHTML += `<option value="${c}">Kelas ${c}</option>`;
+            });
+        }
+
+        function handleAddExam(e) {
+            e.preventDefault();
+            const title = document.getElementById('new-exam-title').value;
+            const jenjang = document.getElementById('new-exam-jenjang').value;
+            const kelas = document.getElementById('new-exam-kelas').value;
+            const duration = document.getElementById('new-exam-durasi').value;
+            
+            examsDB.push({ id: Date.now(), title, jenjang, kelas, duration, token: Math.random().toString(36).substring(2,7).toUpperCase(), isStarted: false, questions: [] });
+            localStorage.setItem('cbt_exams_db', JSON.stringify(examsDB));
+            alert("Ujian berhasil dibuat!");
+            e.target.reset();
+            renderExams();
+        }
+
+        function renderExams() {
+            const container = document.getElementById('guru-exam-list');
+            container.innerHTML = '';
+            if(examsDB.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 bg-white p-4 rounded shadow">Belum ada ujian.</p>`;
+                return;
+            }
+            examsDB.forEach(ex => {
+                container.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg shadow flex justify-between items-center border-l-4 ${ex.isStarted ? 'border-green-500' : 'border-red-500'}">
+                        <div>
+                            <h4 class="font-bold text-lg">${ex.title} <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-mono">Token: ${ex.token}</span></h4>
+                            <p class="text-sm text-gray-600">${ex.jenjang} - Kelas ${ex.kelas} | Durasi: ${ex.duration}</p>
+                        </div>
+                        <div class="space-x-2">
+                            <button onclick="toggleStatus(${ex.id})" class="px-3 py-1.5 rounded text-white text-sm font-bold ${ex.isStarted ? 'bg-amber-500' : 'bg-green-600'}">${ex.isStarted ? 'Berhentikan' : 'Mulai'}</button>
+                            <button onclick="openResults(${ex.id})" class="bg-purple-600 text-white px-3 py-1.5 rounded text-sm font-bold">Hasil & Buka Kunci</button>
+                            <a href="soal.php?id=${ex.id}" class="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-bold inline-block">Kelola Soal</a>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleStatus(id) {
+            const ex = examsDB.find(e => e.id === id);
+            if(ex) {
+                ex.isStarted = !ex.isStarted;
+                localStorage.setItem('cbt_exams_db', JSON.stringify(examsDB));
+                renderExams();
+            }
+        }
+
+        function openResults(examId) {
+            const results = examResultsDB.filter(r => r.examId === examId);
+            const content = document.getElementById('result-modal-content');
+            if(results.length === 0) {
+                content.innerHTML = `<p class="text-gray-500 py-4">Belum ada siswa menyelesaikan ujian ini.</p>`;
+            } else {
+                let html = `<table class="custom-table"><tr><th>NIS</th><th>Nama</th><th>Nilai</th><th>Aksi</th></tr>`;
+                results.forEach(r => {
+                    html += `<tr><td>${r.nis}</td><td>${r.nama}</td><td><b>${r.nilai}</b></td><td><button onclick="unlockStudent(${examId}, '${r.nis}')" class="bg-amber-500 text-white px-3 py-1 rounded text-xs font-bold">🔓 Buka Kunci</button></td></tr>`;
+                });
+                html += `</table>`;
+                content.innerHTML = html;
+            }
+            document.getElementById('modal-exam-results').classList.remove('hidden-view');
+        }
+
+        function unlockStudent(examId, nis) {
+            if(confirm(`Buka kunci ujian untuk siswa NIS ${nis}?`)) {
+                examResultsDB = examResultsDB.filter(r => !(r.examId === examId && r.nis === nis));
+                localStorage.setItem('cbt_results_db', JSON.stringify(examResultsDB));
+                localStorage.removeItem(`cbt_session_${nis}_${examId}`);
+                alert("Ujian berhasil dibuka!");
+                openResults(examId);
+            }
+        }
+
+        function closeResultModal() {
+            document.getElementById('modal-exam-results').classList.add('hidden-view');
+        }
+
+        renderExams();
+    </script>
+</body>
+</html>
