@@ -67,13 +67,12 @@
                 <h3 id="result-modal-title" class="text-xl font-bold text-gray-800">Rekap Hasil & Buka Kunci Siswa</h3>
                 <button onclick="closeResultModal()" class="text-gray-500 font-bold text-xl">✕</button>
             </div>
-            <p class="text-xs text-gray-500 mb-4">Gunakan tombol <strong>🔓 Buka Kunci</strong> untuk siswa yang tidak sengaja menekan tombol selesai ujian agar bisa mengerjakan ulang.</p>
+            <p class="text-xs text-gray-500 mb-4">Gunakan tombol <strong>🔓 Buka Kunci</strong> untuk siswa yang tidak sengaja menekan tombol selesai ujian agar bisa mengerjakan ulang[cite: 1].</p>
             <div id="result-modal-content"></div>
         </div>
     </div>
 
     <script>
-        // Simulasi database ujian dari localStorage
         let examsDB = JSON.parse(localStorage.getItem('cbt_exams_db')) || [];
         let examResultsDB = JSON.parse(localStorage.getItem('cbt_results_db')) || [];
 
