@@ -98,7 +98,6 @@
 
             currentExam.questions.push({ id: Date.now(), type, text, options, correct });
             
-            // Simpan ke localStorage
             const index = examsDB.findIndex(e => e.id === examId);
             if(index !== -1) examsDB[index] = currentExam;
             else examsDB.push(currentExam);
