@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Siswa - CBT Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+    <nav class="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold">Dashboard Siswa - Profil</h1>
+        <a href="login.php" class="bg-red-500 px-4 py-2 rounded text-sm font-bold hover:bg-red-600">Logout</a>
+    </nav>
+
+    <div class="container mx-auto p-6 max-w-2xl mt-8 bg-white rounded-lg shadow">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Identitas Peserta Didik</h2>
+        <div id="profile-info" class="space-y-3 text-sm">
+            <!-- Data dimuat dinamis dari localStorage -->
+        </div>
+    </div>
+
+    <script>
+        // Simulasi pembacaan sesi user aktif
+        let usersDB = JSON.parse(localStorage.getItem('cbt_users_db')) || [];
+        let currentUser = usersDB.find(u => u.role === 'siswa') || usersDB[1]; // default sample
+
+        if (currentUser) {
+            document.getElementById('profile-info').innerHTML = `
+                <p><strong>Nama Lengkap:</strong> ${currentUser.nama}</p>
+                <p><strong>Nomor Induk Siswa (NIS):</strong> ${currentUser.nis}</p>
+                <p><strong>Jenjang Pendidikan:</strong> ${currentUser.jenjang || 'SMA / SMK'}</p>
+                <p><strong>Kelas:</strong> Kelas ${currentUser.kelas || '11'}</p>
+                <p><strong>Sekolah:</strong> ${currentUser.sekolah || '-'}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
