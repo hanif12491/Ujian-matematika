@@ -16,7 +16,7 @@
 
     <nav class="bg-green-600 text-white p-4 shadow-md flex justify-between items-center">
         <h1 class="text-xl font-bold">Panel Admin / Guru - Modul Ujian</h1>
-        <a href="../login.php" class="bg-red-500 px-4 py-2 rounded text-sm font-bold hover:bg-red-600">Logout</a>
+        <a href="../login.html" class="bg-red-500 px-4 py-2 rounded text-sm font-bold hover:bg-red-600">Logout</a>
     </nav>
 
     <div class="container mx-auto p-6 max-w-7xl">
@@ -118,7 +118,7 @@
                         <div class="space-x-2">
                             <button onclick="toggleStatus(${ex.id})" class="px-3 py-1.5 rounded text-white text-sm font-bold ${ex.isStarted ? 'bg-amber-500' : 'bg-green-600'}">${ex.isStarted ? 'Berhentikan' : 'Mulai'}</button>
                             <button onclick="openResults(${ex.id})" class="bg-purple-600 text-white px-3 py-1.5 rounded text-sm font-bold">Hasil & Buka Kunci</button>
-                            <a href="soal.php?id=${ex.id}" class="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-bold inline-block">Kelola Soal</a>
+                            <a href="soal.html?id=${ex.id}" class="bg-blue-600 text-white px-3 py-1.5 rounded text-sm font-bold inline-block">Kelola Soal</a>
                         </div>
                     </div>
                 `;
