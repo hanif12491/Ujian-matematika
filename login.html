@@ -24,6 +24,7 @@
             </div>
             <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded-lg hover:bg-blue-700 transition text-sm">MASUK SISTEM</button>
         </form>
+        
         <div class="mt-4 text-center text-xs">
             <a href="index.html" class="text-blue-600 hover:underline">← Kembali ke Beranda</a>
         </div>
@@ -41,8 +42,10 @@
             if (user) {
                 alert(`Login Berhasil! Selamat datang, ${user.nama}`);
                 if (user.role === 'guru') {
-                    window.location.href = 'admin/ujian.php';
+                    // Mengarahkan ke panel admin di dalam folder admin/
+                    window.location.href = 'admin/ujian.html';
                 } else {
+                    // Mengarahkan ke profil/dashboard siswa
                     window.location.href = 'profil.html';
                 }
             } else {
